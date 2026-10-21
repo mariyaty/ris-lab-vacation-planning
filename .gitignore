@@ -1,1 +1,18 @@
 .DS_Store
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# macOS
+.DS_Store
+
+# Environment variables
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
