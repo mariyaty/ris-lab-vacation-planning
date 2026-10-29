@@ -1,7 +1,8 @@
 import { ref } from 'vue'
 
-// Единый источник тестовых данных для всех страниц приложения.
-const requests = ref([
+// Единый источник заявок для списка, боковой навигации и формы.
+// Данные существуют только в памяти браузера и сбрасываются после F5.
+export const items = ref([
   {
     id: 1,
     number: 'VR-00001',
@@ -20,24 +21,29 @@ const requests = ref([
   },
 ])
 
-let nextId = 3
+export let nextId = 3
 
-export function useTicketsStore() {
-  function createTicket({ title, siteId, description }) {
-    const ticket = {
-      id: nextId,
-      number: `VR-${String(nextId).padStart(5, '0')}`,
-      title: title.trim(),
-      siteId: Number(siteId),
-      description: description.trim(),
-      status: 'New',
-    }
-    nextId += 1
-    requests.value.unshift(ticket)
-    return ticket
+export function addItem({ title, siteId, description }) {
+  const item = {
+    id: nextId,
+    number: `TMP-${nextId}`,
+    title: title.trim(),
+    siteId: Number(siteId),
+    description: description.trim(),
+    status: 'New',
   }
 
-  return { requests, createTicket }
+  items.value.unshift(item)
+  nextId += 1
+  return item
+}
+
+// Сохраняем совместимость с компонентами, созданными в ЛР4.
+export function useTicketsStore() {
+  return {
+    requests: items,
+    createTicket: addItem,
+  }
 }
 
 export const statusLabels = {
