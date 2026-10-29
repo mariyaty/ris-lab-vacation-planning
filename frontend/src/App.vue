@@ -21,7 +21,7 @@ import AppHeader from './components/AppHeader.vue'
 
       <footer class="page-footer">
         <span>ПланГрафик · Учебный проект</span>
-        <span>Лабораторная работа № 4 · Vue 3</span>
+        <span>Лабораторная работа № 5 · Vue 3</span>
       </footer>
     </main>
   </div>
