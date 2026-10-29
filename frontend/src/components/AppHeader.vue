@@ -1,9 +1,9 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import { useTicketsStore } from '../ticketsStore'
+import { items } from '../ticketsStore'
 
 const route = useRoute()
-const { requests } = useTicketsStore()
+
 </script>
 
 <template>
@@ -16,7 +16,7 @@ const { requests } = useTicketsStore()
     <div class="workspace-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
     <nav class="navigation" aria-label="Главная навигация">
       <RouterLink class="nav-item" :class="{ active: route.path === '/' }" to="/">
-        <span class="nav-icon">▤</span><span>Заявки</span><span class="nav-count">{{ requests.length }}</span>
+        <span class="nav-icon">▤</span><span>Заявки</span><span class="nav-count">{{ items.length }}</span>
       </RouterLink>
       <RouterLink class="nav-item" :class="{ active: route.path === '/new' }" to="/new">
         <span class="nav-icon plus-icon">＋</span><span>Создать заявку</span>
