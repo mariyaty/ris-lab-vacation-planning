@@ -5,3 +5,21 @@
 /* ЛР5: сообщения валидации рядом с полями формы */
 .field-error{margin:6px 0 0;color:#c62828;font-size:12px;line-height:1.45}
 .field-group input[aria-invalid="true"],.field-group textarea[aria-invalid="true"]{border-color:#d84b4b;outline-color:#d84b4b}
+
+/* Состояния асинхронной загрузки API (ЛР6) */
+.api-state{min-height:260px;padding:42px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px}
+.api-state>strong{font:700 14px Manrope,sans-serif;color:#344054}
+.api-state>p{max-width:420px;margin:0 0 7px;color:#929caf;font-size:11px;line-height:1.6}
+.state-spinner{width:27px;height:27px;border:3px solid #e6edff;border-top-color:#245be8;border-radius:50%;animation:api-spin .8s linear infinite;margin-bottom:5px}
+@keyframes api-spin{to{transform:rotate(360deg)}}
+.state-symbol{width:36px;height:36px;border-radius:11px;background:#edf3ff;color:#245be8;display:grid;place-items:center;font-size:19px;font-weight:700;margin-bottom:4px}
+.api-error .state-symbol{background:#fff0f1;color:#c34e5a}
+.api-error>p{color:#b45b64}
+.testing-options{border:1px solid #e8edf4;border-radius:8px;padding:11px 13px;color:#657188;font-size:11px}
+.testing-options summary{cursor:pointer;font-weight:700;color:#526078}
+.testing-options label{display:flex;align-items:flex-start;gap:8px;margin-top:11px;line-height:1.5}
+.testing-options input{accent-color:#245be8;margin:1px 0 0}
+.testing-options small{display:block;margin-top:9px;color:#9aa4b3;line-height:1.5}
+.form-feedback{margin:0;border:1px solid #dce8ff;background:#f3f7ff;color:#3559a6;padding:11px 13px;border-radius:8px;font-size:11px;line-height:1.6}
+.form-feedback-error{border-color:#f3d7da;background:#fff6f6;color:#b83e4b}
+.form-actions button:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
