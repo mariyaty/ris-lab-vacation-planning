@@ -1,7 +1,8 @@
+
 import { ref } from 'vue'
 
-// Единый источник заявок для списка, боковой навигации и формы.
-// Данные существуют только в памяти браузера и сбрасываются после F5.
+// Единый источник заявок для списка,
+// боковой навигации и формы.
 export const items = ref([
   {
     id: 1,
@@ -21,24 +22,26 @@ export const items = ref([
   },
 ])
 
-export let nextId = 3
-
-export function addItem({ title, siteId, description }) {
-  const item = {
-    id: nextId,
-    number: `TMP-${nextId}`,
-    title: title.trim(),
-    siteId: Number(siteId),
-    description: description.trim(),
-    status: 'New',
-  }
-
-  items.value.unshift(item)
-  nextId += 1
-  return item
+// Заменяем содержимое общего списка данными API.
+export function setItems(tickets) {
+  items.value = Array.isArray(tickets) ? tickets : []
 }
 
-// Сохраняем совместимость с компонентами, созданными в ЛР4.
+// Добавляем заявку, полученную от API или mock.
+export function addItem(ticket) {
+  const existingIndex = items.value.findIndex(
+    (item) => item.id === ticket.id
+  )
+
+  if (existingIndex !== -1) {
+    items.value.splice(existingIndex, 1)
+  }
+
+  items.value.unshift(ticket)
+  return ticket
+}
+
+// Сохраняем совместимость с компонентами ЛР4 и ЛР5.
 export function useTicketsStore() {
   return {
     requests: items,
