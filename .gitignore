@@ -16,3 +16,10 @@ dist/
 .idea/
 .vscode/
 
+# .NET build output
+**/bin/
+**/obj/
+
+# Visual Studio local files
+.vs/
+
