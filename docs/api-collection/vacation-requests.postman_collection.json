@@ -1,0 +1,284 @@
+{
+  "info": {
+    "_postman_id": "a7b9c2d4-3e61-4a8b-9d10-202611250008",
+    "name": "ПланГрафик — ЛР8 REST API",
+    "description": "Проверка создания, чтения, назначения ответственного и смены статуса заявок на планирование отпусков. Данные хранятся в памяти backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "requestId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Создать заявку — 201",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/vacation-requests",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Планирование отпусков участка связи\",\n  \"siteId\": 2,\n  \"description\": \"Подготовить проект графика отпусков работников участка связи.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+              "const data = pm.response.json();",
+              "pm.expect(data).to.have.property('id');",
+              "pm.expect(data.number).to.match(/^VR-\\d{5}$/);",
+              "pm.expect(data.status).to.eql('New');",
+              "pm.expect(data.assigneeUserId).to.eql(null);",
+              "pm.collectionVariables.set('requestId', data.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Создать заявку с коротким title — 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/vacation-requests",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"abc\",\n  \"siteId\": 2,\n  \"description\": \"Описание тестовой заявки для проверки.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Получить список заявок — 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/vacation-requests"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.expect(pm.response.json()).to.be.an('array');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Получить заявку по id — 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/vacation-requests/{{requestId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Несуществующий id — 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/vacation-requests/999999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Перевести без исполнителя — 409",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/vacation-requests/{{requestId}}/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"InProgress\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 409', () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07. Назначить исполнителя — 200",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/vacation-requests/{{requestId}}/assignee",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"assigneeUserId\": 5\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.expect(pm.response.json().assigneeUserId).to.eql(5);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08. Изменить статус — 200",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/vacation-requests/{{requestId}}/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"InProgress\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.expect(pm.response.json().status).to.eql('InProgress');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09. Недопустимый статус — 400",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/vacation-requests/{{requestId}}/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Unknown\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
