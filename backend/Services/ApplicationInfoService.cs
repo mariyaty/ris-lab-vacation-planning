@@ -16,7 +16,7 @@ public sealed class ApplicationInfoService : IApplicationInfoService
         return new ApplicationInfo(
             ApplicationName: "ИИ-система планирования графика отпусков",
             Environment: _environment.EnvironmentName,
-            Version: "ЛР7"
+            Version: "ЛР8"
         );
     }
 }
