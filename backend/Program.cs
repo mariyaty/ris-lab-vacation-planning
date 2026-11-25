@@ -1,18 +1,47 @@
 using RisVacationPlanning.Backend.Models;
-using RisVacationPlanning.Backend.Services;
+using RisVacationPlanning.Backend.Services;\nusing Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC controllers are registered now; the tickets controller will receive
-// its actions in the next laboratory work.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register the service through DI. Do not instantiate it with `new` in a controller.
 builder.Services.AddSingleton<IApplicationInfoService, ApplicationInfoService>();
+// ЛР8: хранилище заявок существует в памяти процесса.
+builder.Services.AddSingleton<VacationRequestService>();
 
 var app = builder.Build();
+
+// Единая безопасная обработка неожиданных ошибок: подробности остаются на сервере.
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (Exception)
+    {
+        var logger = context.RequestServices
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("GlobalExceptionHandler");
+
+        logger.LogError("Unhandled server error; path={Path}", context.Request.Path);
+
+        if (!context.Response.HasStarted)
+        {
+            context.Response.Clear();
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "application/problem+json";
+            await context.Response.WriteAsJsonAsync(new ProblemDetails
+            {
+                Status = StatusCodes.Status500InternalServerError,
+                Title = "Внутренняя ошибка сервера.",
+                Detail = "Произошла непредвиденная ошибка. Повторите попытку позже."
+            });
+        }
+    }
+});
 
 if (app.Environment.IsDevelopment())
 {
@@ -32,5 +61,4 @@ app.MapGet("/info", (IApplicationInfoService infoService) =>
     .Produces<ApplicationInfo>(StatusCodes.Status200OK);
 
 app.MapControllers();
-
 app.Run();
