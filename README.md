@@ -313,3 +313,67 @@ Swagger: `http://localhost:5000/swagger`.
 
 Отчёт: [docs/reports/lab-08.md](docs/reports/lab-08.md).
 
+
+
+## Лабораторная работа № 9. PostgreSQL и SQL
+
+В ЛР9 подготовлена отдельная SQL-схема для предметной области проекта. Она включает три таблицы:
+
+- `sites` — справочник участков предприятия;
+- `users` — пользователи системы;
+- `vacation_requests` — заявки на планирование отпусков.
+
+В `db/schema.sql` находятся таблицы, первичные и внешние ключи, ограничения `CHECK` и индексы. В `db/seed.sql` находятся учебные записи с четырьмя допустимыми статусами. В `db/queries.sql` находятся запросы с фильтрацией, сортировкой, `JOIN` и `GROUP BY`, а также пример проверки ограничения статуса.
+
+### Запуск в GitHub Codespaces
+
+ЛР9 выполняется отдельно от backend. Подключать Entity Framework Core и менять REST API ЛР8 не требуется.
+
+Установите PostgreSQL в Codespaces (если он ещё не установлен):
+
+```bash
+sudo apt update
+sudo apt install -y postgresql postgresql-contrib
+sudo service postgresql start
+```
+
+Создайте отдельную учебную базу:
+
+```bash
+sudo -u postgres createdb course_vacation_planning
+```
+
+Выполните SQL-файлы из корня репозитория:
+
+```bash
+sudo -u postgres psql -d course_vacation_planning -f db/schema.sql
+sudo -u postgres psql -d course_vacation_planning -f db/seed.sql
+sudo -u postgres psql -d course_vacation_planning -f db/queries.sql
+```
+
+Проверить таблицы можно командой:
+
+```bash
+sudo -u postgres psql -d course_vacation_planning -c "\dt"
+```
+
+Проверить сохранность данных:
+
+```bash
+sudo service postgresql restart
+sudo -u postgres psql -d course_vacation_planning -c "SELECT status, COUNT(*) FROM vacation_requests GROUP BY status ORDER BY status;"
+```
+
+Ожидается по одной заявке для каждого статуса: `Cancelled`, `Closed`, `InProgress`, `New`.
+
+### Проверка ограничения CHECK
+
+В `db/queries.sql` в конце находится закомментированная вставка со статусом `Done`. Для проверки скопируйте этот запрос, уберите комментарии и выполните отдельно. PostgreSQL должен отклонить вставку с нарушением ограничения `CHECK`. Не добавляйте эту ошибочную строку в `seed.sql`.
+
+### Пересоздание учебной схемы
+
+`db/schema.sql` сначала удаляет только таблицы `vacation_requests`, `users` и `sites`, а затем создаёт их заново. Запускайте этот файл только в отдельной учебной базе `course_vacation_planning`: все данные в этих трёх таблицах будут удалены и созданы заново при повторном выполнении.
+
+### Отчёт
+
+Отчёт по ЛР9: [docs/reports/lab-09.md](docs/reports/lab-09.md).
